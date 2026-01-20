@@ -12,3 +12,21 @@ Methods:
 In this analysis, a Nanopore-only workflow was followed using Oxford Nanopore R10 chemistry sequencing data. This approach takes advantage of the recent technological advances, making long-read only assemblies accurate without requiring hybrid approaches. 
 Quality control will be performed using NanoPlot v1.42.0 (De Coster et al., 2018) to assess read length distribution, quality scores, and sequencing yield.
 There are several assembler options for long-read bacterial genome assembly. Flye version 2.9.6 was chosen over others like Canu and Raven as it uses a repeat graph approach proven to perform well with bacterial genomes, and has the ability to handle long-read data efficiently while maintaining faster runtimes than Canu (Kolmogorov et al., 2019). After assembly I will use Medaka version 2.2.0 for consensus polishing as it uses neural networks trained on nanopore data to correct errors introduced in basecalling. For whole-genome alignment and variant calling I will use Minimap2 version 2.20 over MUMmer4 because while MUMmer is good for detecting structural variations, Minimap2 has improved speed and is better optimized for Nanopore reads (Li, 2018; Saada et al., 2024). Variant detection will be done also using Medaka as it is optimized for nanopore data. Recent benchmarking studies showed that it achieved F1 scores exceeding 99% for SNPs and 95% for indels with R10 data and high-accuracy basecalling (Hall et al., 2024), making it a better choice compared to BCFtools for this project. 
+
+References:
+
+  Bogaerts, B., Bossche, A. V. den, Verhaegen, B., Delbrassinne, L., Mattheus, W., Nouws, S., & Godfroid, M. (2024, May 4). Closing the gap: Oxford Nanopore Technologies R10 sequencing allows comparable results to illumina sequencing for SNP-based outbreak investigation of bacterial pathogens. Journal of clinical microbiology. https://doi.org/10.1128/jcm.01576-23 
+
+  Bogaerts, B., Maex, M., Commans, F., & Goeders, N. (2025, August 22). Oxford Nanopore Technologies R10 sequencing enables accurate cgmlst-based bacterial outbreak investigation of neisseria meningitidis and salmonella enterica when accounting for methylation-related errors. Journal of clinical microbiology. https://doi.org/10.1128/jcm.00410-25 
+
+  De Coster, W., D’Hert, S., Schultz, D. T., Cruts, M., & Van Broeckhoven, C. (2018, August 1). NanoPack: Visualizing and processing long-read sequencing data. Bioinformatics (Oxford, England). https://doi.org/10.1093/bioinformatics/bty149 
+
+  Hall, M. B., Wick, R. R., Judd, L. M., Nguyen, A. N., Steinig, E. J., Xie, O., Davies, M., Seemann, T., Stinear, T. P., & Coin, L. (2024, October 10). Benchmarking reveals superiority of deep learning variant callers on bacterial nanopore sequence data. eLife. https://doi.org/10.7554/elife.98300 
+
+  Kolmogorov, M., Yuan, J., Lin, Y., & Pevzner, P. A. (2019, April 1). Assembly of long, error-prone reads using repeat graphs. Nature News. https://doi.org/10.1038/s41587-019-0072-8 
+
+  Li, H. (2018, September). Minimap2: Pairwise alignment for nucleotide sequences | bioinformatics | oxford academic. Oxford Academic. https://doi.org/10.1093/bioinformatics/bty191 
+
+  Saada, B., Zhang, T., Siga, E., Zhang, J., & Magalhães Muniz, M. M. (2024, June 3). Whole-genome alignment: Methods, challenges, and future directions. MDPI. https://doi.org/10.3390/app14114837 
+
+  Sanderson, N. D., Hopkins, K. M. V., Colpus, M., Parker, M., Lipworth, S., Crook, D., & Stoesser, N. (2024, May 7). Evaluation of the accuracy of bacterial genome reconstruction with Oxford nanopore R10.4.1 long-read-only sequencing. microbiologyresearch.org. https://doi.org/10.1099/mgen.0.001246 
