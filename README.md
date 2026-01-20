@@ -16,7 +16,7 @@ There are also challenges that come with alignment and variant calling. Whole-ge
 Methods:
 
 In this analysis, a Nanopore-only workflow was followed using Oxford Nanopore R10 chemistry sequencing data. This approach takes advantage of the recent technological advances, making long-read only assemblies accurate without requiring hybrid approaches. 
-Quality control will be performed using NanoPlot v1.42.0 (De Coster et al., 2018) to assess read length distribution, quality scores, and sequencing yield.
+Quality control will be performed using NanoPlot v1.46.2 (De Coster et al., 2018) to assess read length distribution, quality scores, and sequencing yield.
 There are several assembler options for long-read bacterial genome assembly. Flye version 2.9.6 was chosen over others like Canu and Raven as it uses a repeat graph approach proven to perform well with bacterial genomes, and has the ability to handle long-read data efficiently while maintaining faster runtimes than Canu (Kolmogorov et al., 2019). After assembly I will use Medaka version 2.2.0 for consensus polishing as it uses neural networks trained on nanopore data to correct errors introduced in basecalling. For whole-genome alignment and variant calling I will use Minimap2 version 2.20 over MUMmer4 because while MUMmer is good for detecting structural variations, Minimap2 has improved speed and is better optimized for Nanopore reads (Li, 2018; Saada et al., 2024). Variant detection will be done also using Medaka as it is optimized for nanopore data. Recent benchmarking studies showed that it achieved F1 scores exceeding 99% for SNPs and 95% for indels with R10 data and high-accuracy basecalling (Hall et al., 2024), making it a better choice compared to BCFtools for this project. 
 
 References:
