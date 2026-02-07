@@ -36,3 +36,24 @@ References:
   Saada, B., Zhang, T., Siga, E., Zhang, J., & Magalhães Muniz, M. M. (2024, June 3). Whole-genome alignment: Methods, challenges, and future directions. MDPI. https://doi.org/10.3390/app14114837 
 
   Sanderson, N. D., Hopkins, K. M. V., Colpus, M., Parker, M., Lipworth, S., Crook, D., & Stoesser, N. (2024, May 7). Evaluation of the accuracy of bacterial genome reconstruction with Oxford nanopore R10.4.1 long-read-only sequencing. microbiologyresearch.org. https://doi.org/10.1099/mgen.0.001246 
+
+
+
+
+
+Part 2
+
+Methods redone/finalized:
+
+Dataset Description
+The dataset for this analysis consists of Oxford Nanopore R10 chemistry sequencing data of Salmonella enterica. The reads had an expected accuracy of Q20+ and an N50 read length ranging from 5-15 kb. The raw reads were provided in FASTQ format containing both sequence data and per-base quality scores.
+
+Reference genome
+The reference genome used for alignment and variant calling was Salmonella enterica subsp. enterica serovar Typhimurium strain LT2 (GenBank accession: NC_003197.2).
+
+This strain was chosen because it is one of the most well-characterized S. enterica strains with a complete, high-quality genome assembly and extensive annotation, making it ideal for comparative genomics and variant detection
+
+quality control
+Quality assessment of raw Nanopore reads was performed using NanoPlot v1.46.2 (De Coster et al., 2018)
+
+
