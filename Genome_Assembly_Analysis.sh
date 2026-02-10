@@ -26,6 +26,11 @@ unzip ncbi_dataset.zip
 mv ncbi_dataset/data/GCF_000006945.2/GCF_000006945.2_ASM694v2_genomic.fna reference.fasta
 cd ..
 
+# nanoplot needed arrow to install and work. not present in compute canada's narval  wheel? (pyarrow dependency)
+module load gcc
+module load arrow
+
+
 # load python virtual environment for NanoPlot 
 module load python/3.13
 python -m venv bioinfo_env
@@ -40,6 +45,9 @@ pip install matplotlib
 pip install seaborn
 pip install numpy
 
+# compute canada wheelhouse has old version of medaka, installing it seperately without dependencies, will see what happens.
+pip install --no-index --upgrade pip
+pip install --no-deps medaka
 
 # Quality Control
 NanoPlot --fastq data/raw_reads.fastq --outdir qc --plots dot kde --threads 4
