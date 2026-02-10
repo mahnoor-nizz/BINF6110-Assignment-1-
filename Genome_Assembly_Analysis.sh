@@ -14,6 +14,21 @@ module load minimap2/2.26
 module load samtools/1.18
 module load bcftools/1.18
 
+# Create & activate virtual environment
+python -m venv bioinfo_env
+source bioinfo_env/bin/activate
+
+# Upgrade pip
+pip install --upgrade pip
+
+# Install the Python-based tools
+pip install NanoPlot==1.41.0
+pip install medaka==2.
+pip install biopython
+pip install pandas
+pip install matplotlib
+pip install seaborn
+
 # Set directories
 mkdir -p data qc assembly polish alignment variants visualization
 
