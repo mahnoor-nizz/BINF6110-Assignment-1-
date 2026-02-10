@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# BINF 6110 Assignment 1 - Analysis Pipeline
+# Analysis of Salmonella enterica genome assembly and comparison to reference genome
+
+module load StdEnv/2023
+module load python/3.13
+module load arrow 
+module load gcc/9.3.0
+module load sra-toolkit/3.0.9
+
+module load flye/2.9.2
+module load minimap2/2.26
+module load samtools/1.18
+module load bcftools/1.18
+
+# Set directories
+mkdir -p data qc assembly polish alignment variants visualization
+
+# Download raw data
+cd data
+wget https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR32410565/SRR32410565
+
+# Convert raw reads to FASTQ format
+
+fasterq-dump SRR32410565
+mv SRR32410565.fastq raw_reads.fastq
+
+# Download Reference genome
+wget "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/GCF_000006945.2/download?include_annotation_type=GENOME_FASTA&include_annotation_type=GENOME_GFF&include_annotation_type=RNA_FASTA&include_annotation_type=CDS_FASTA&include_annotation_type=PROT_FASTA&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED" -O ncbi_dataset.zip
+unzip ncbi_dataset.zip
+mv ncbi_dataset/data/GCF_000006945.2/GCF_000006945.2_ASM694v2_genomic.fna reference.fasta
+cd ..
+
+# Quality Control
+NanoPlot --fastq data/raw_reads.fastq --outdir qc --plots dot kde --threads 4
