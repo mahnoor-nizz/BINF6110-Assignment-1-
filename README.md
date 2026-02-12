@@ -137,9 +137,6 @@ bcftools call -v --ploidy 1 -Ov -o variants/raw_variants.vcf
 bcftools filter -i 'QUAL>=20 && DP>=10' \
                 variants/raw_variants.vcf \
                 -o variants/filtered_variants.vcf
-
-# Generate stats
-bcftools stats variants/filtered_variants.vcf > variants/variant_stats.txt
 ```
 
 **Parameters:**
@@ -167,11 +164,11 @@ Multiple visualization approaches were employed to examine assembly quality, var
 
 The assembly graph was visualized using **Bandage v0.8.1** (Wick et al., 2015) to examine contig structure, identify circular contigs (complete chromosomes and plasmids), and detect potential misassemblies:
 
-```bash
-Bandage image assembly/assembly_graph.gfa assembly_graph.png
-```
 
 
+![Alt text for the image](https://github.com/mahnoor-nizz/BINF6110-Assignment-1-/blob/main/Visualizations%20%26%20Images/graph.png)
+
+![Alt text for the image](./Visualizations & Images/graph.png)
 
 
 
