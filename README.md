@@ -43,8 +43,7 @@ NanoPlot --fastq data/raw_reads.fastq \
 ```
 
 **Parameters:**
-- `--plots dot kde`: Generates scatter plots and kernel density estimates to visualize the relationship between read length and quality score distributions
-- `--threads 8`: Uses 8 CPU cores for parallel processing
+`--plots dot kde` Was used to generate scatter plots and kernel density estimates to visualize the relationship between read length and quality score distributions, and `--threads 8` to use 8 CPU cores for parallel processing
 
 This quality control step assessed read length distribution (N50, mean, median), quality score distribution, total sequencing yield, and identified any potential contamination or quality issues that could affect downstream assembly.
 
@@ -61,16 +60,13 @@ flye --nano-hq data/raw_reads.fastq \
 ```
 
 **Parameters:**
-- `--nano-hq`: Preset optimized for high-quality Nanopore reads (Q20+). This uses error models specifically calibrated for improved basecalling accuracy compared to older chemistries with higher error rates and poorer read quality.
-- `--genome-size 5m`: Expected genome size of approximately 5 megabases based on typical *Salmonella* genome sizes (4.8-5.2 Mb). This helps optimize memory allocation and guides initial contig construction algorithms.
-- `--iterations 2`: Number of polishing iterations. R10 chemistry with high base accuracy (Q20+) tends to require fewer polishing iterations compared to older chemistry.
-- `--threads 8`: 8 CPU threads.
+`--nano-hq` Was used as it is a preset optimized for high-quality Nanopore reads (Q20+), which uses error models specifically calibrated for improved basecalling accuracy compared to older chemistries with higher error rates and poorer read quality. `--genome-size 5m` Was used to set the expected genome size to 5 megabases, based on typical *Salmonella* genome sizes (4.8-5.2 Mb), which helps optimize memory allocation and guides initial contig construction algorithms. `--iterations 2` Sets the number of polishing iterations. R10 chemistry with high base accuracy (Q20+) tends to require fewer polishing iterations compared to older chemistry.
 
 Flye was selected over alternative assemblers (Canu, Raven) because it uses a repeat graph approach that has been shown to perform well with bacterial genomes, effectively resolving complex repeat structures such as prophage sequences and insertion elements common in *Salmonella*. Additionally, Flye maintains faster runtimes than Canu while achieving comparable or superior assembly quality for R10 data. (Kolmogorov et al., 2019)
 
 ### Assembly Quality Assesment
 
-Assembly quality was evaluated using **QUAST v5.3.0** (Gurevich et al., 2013):
+Assembly quality was evaluated using **QUAST v5.2.0** (Gurevich et al., 2013):
 
 ```bash
 quast assembly/assembly.fasta \
@@ -100,9 +96,7 @@ minimap2 -ax asm5 \
 ```
 
 **Parameters:**
-- `-ax asm5`: Alignment preset for assembly-to-reference comparison, optimized for 5% sequence divergence which is typical for intra-species variation in *Salmonella*
-- `--cs`: Generates CS tags containing detailed CIGAR strings, which are needed for accurate downstream variant calling and structural variant detection
-- `-t 8`: Number of CPU threads.
+`-ax asm5` is an alignment preset for assembly-to-reference comparison, optimized for 5% sequence divergence which is typical for intra-species variation in *Salmonella*. `--cs` was used to generate CS tags containing detailed CIGAR strings, which are needed for accurate downstream variant calling and structural variant detection.
 
 #### Read-to-Reference Alignment
 
@@ -116,30 +110,16 @@ minimap2 -ax map-ont \
 ```
 
 **Parameters:**
-- `-ax map-ont`: Preset optimized for aligning Oxford Nanopore reads to reference genome
-- `-t 8`: Number of threads
+`-ax map-ont` Is a preset optimized for aligning Oxford Nanopore reads to reference genome.
 
-Both alignments were converted to sorted BAM format using **samtools v1.22.1**:
-
-```bash
-# Process assembly alignment
-samtools view -bS alignment/assembly_vs_ref.sam > alignment/assembly_vs_ref.bam
-samtools sort alignment/assembly_vs_ref.bam -o alignment/assembly_vs_ref.sorted.bam
-samtools index alignment/assembly_vs_ref.sorted.bam
-
-# Process read alignment
-samtools view -bS alignment/reads_vs_ref.sam > alignment/reads_vs_ref.bam
-samtools sort alignment/reads_vs_ref.bam -o alignment/reads_vs_ref.sorted.bam
-samtools index alignment/reads_vs_ref.sorted.bam
-```
-
-Coverage statistics were generated using samtools:
+Both alignments were converted to sorted BAM format using **samtools v1.22.1**, and coverage statistics were also generated using samtools:
 
 ```bash
-samtools flagstat alignment/reads_vs_ref.sorted.bam > alignment/reads_alignment_stats.txt
-samtools depth alignment/reads_vs_ref.sorted.bam > alignment/reads_coverage.txt
-samtools coverage alignment/reads_vs_ref.sorted.bam > alignment/reads_coverage_summary.txt
+samtools flagstat 
+samtools depth 
+samtools coverage
 ```
+
 ### Variant Calling
 
 #### SNP and Small Indel Detection
@@ -147,9 +127,6 @@ samtools coverage alignment/reads_vs_ref.sorted.bam > alignment/reads_coverage_s
 Variant detection from the read alignment was performed using **BCFtools v1.22** (Danecek et al., 2021):
 
 ```bash
-# Index reference genome
-samtools faidx data/reference.fasta
-
 # Call variants
 bcftools mpileup -f data/reference.fasta \
                  alignment/reads_vs_ref.sorted.bam \
@@ -166,10 +143,7 @@ bcftools stats variants/filtered_variants.vcf > variants/variant_stats.txt
 ```
 
 **Parameters:**
-- `--ploidy 1`: Specifies haploid organism as we are analyzing a bacterial genome with a single circular chromosome. The default diploid setting would incorrectly assume heterozygous variants.
-- `-v`: Output variant sites only.
-- `QUAL>=20`: Minimum Phred quality score of 20, corresponding to 99% confidence in the variant call.
-- `DP>=10`: Minimum read depth of 10 reads supporting the variant. This ensures calls are well-supported and reduces false positives from sequencing errors
+`--ploidy 1` was used to specify a haploid organism, as the genome is bacterial with a single circular chromosome and the default diploid setting would incorrectly assume heterozygous variants. `-v` outputs variant sites only and `QUAL>=20` sets a minimum Phred quality score of 20, corresponding to 99% confidence in the variant call, while `DP>=10` sets a minimum read depth of 10 reads supporting the variant. This ensures calls are well-supported and reduces false positives from sequencing errors.
 
 These filtering thresholds were selected based on best practices for bacterial variant calling (Olson et al., 2015).
 
