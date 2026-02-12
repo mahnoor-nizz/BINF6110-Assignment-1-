@@ -1,7 +1,8 @@
-# BINF6110-Assignment-1-
-BINF 6110 assignment 1
+# *Salmonella enterica* Genome Assembly and Comparison
+BINF 6110 
+Mahnoor Nizamani
 
-Introduction:
+## Introduction:
 
 Salmonella enterica is a major foodborne pathogen responsible for significant occurrences of illness worldwide, with some strains exhibiting different host specificities and virulence factors. Analyzing genomic variations can help shed light on the reasons for these differences and help with outbreak investigation and monitoring.
 
@@ -13,7 +14,39 @@ This nanopore only approach simplifies workflow, eliminating the need for separa
 There are also challenges that come with alignment and variant calling. Whole-genome alignment algorithms have to be able to handle genomic rearrangements, insertions, deletions, and inversions that might occur between different strains (Saada et al., 2024). The choice of alignment method, whether they’re suffix tree-based (MUMmer), anchor-based (Minimap2), or graph-based approaches, can significantly impact the detection of structural variations and single nucleotide polymorphisms (SNPs). Despite the challenges, variant calling using long-read data has shown considerable improvement after the development of deep learning-based approaches. A recent benchmarking study by Hall demonstrated that tools like Clair3, DeepVariant, and Medaka could match or exceed the accuracy of Illumina-based variant calling in bacterial genomes. However, errors related to DNA methylation can still affect variant calling, so careful consideration of basecalling models and polishing methods are necessary (Bogaerts et al., 2025).
 
 
-Methods:
+## Methods:
+
+### Dataset Description
+
+The dataset for this analysis consisted of Oxford Nanopore R10.4.1 chemistry sequencing data for *Salmonella enterica* (NCBI accession: SRR32410565). The reads were generated with expected accuracy of Q20+ (>99% base accuracy) and N50 read lengths ranging from 5-15 kb. The raw reads were provided in FASTQ format containing both sequence data and per-base quality scores. A total of 196,031 reads were sequenced, yielding sufficient coverage for high-quality genome assembly.
+
+### Reference Genome
+
+The reference genome used for alignment and variant calling was *Salmonella enterica* subsp. *enterica* serovar Typhimurium strain LT2, downloaded from NCBI GenBank:
+
+- **Accession:** NC_003197.2 (GCF_000006945.2_ASM694v2)
+- **Genome size:** 4,857,432 bp (chromosome)
+- **Completeness:** Complete genome assembly, single circular chromosome
+
+Strain LT2 was selected as the reference because it is one of the most well characterized *S. enterica* strains with a complete, high-quality genome assembly and extensive functional annotation, making it ideal for comparative genomics and variant detection studies.
+
+### Quality Control
+
+Quality assessment of raw Nanopore reads was performed using **NanoPlot v1.46.2** (De Coster et al., 2018):
+
+```bash
+NanoPlot --fastq data/raw_reads.fastq \
+         --outdir qc \
+         --plots dot kde \
+         --threads 4
+```
+
+**Parameters:**
+- `--plots dot kde`: Generates scatter plots and kernel density estimates to visualize the relationship between read length and quality score distributions
+- `--threads 4`: Utilizes 4 CPU cores for parallel processing
+
+This quality control step assessed read length distribution (N50, mean, median), quality score distribution, total sequencing yield, and identified any potential contamination or quality issues that could affect downstream assembly.
+
 
 In this analysis, a Nanopore-only workflow was followed using Oxford Nanopore R10 chemistry sequencing data. This approach takes advantage of the recent technological advances, making long-read only assemblies accurate without requiring hybrid approaches. 
 Quality control will be performed using NanoPlot v1.46.2 (De Coster et al., 2018) to assess read length distribution, quality scores, and sequencing yield.
