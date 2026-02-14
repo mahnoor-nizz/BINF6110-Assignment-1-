@@ -11,20 +11,19 @@
 # Clone repository git clone git@github.com:mahnoor-nizz/BINF6110-Assignment-1-.git
 
 
-#Load Modules
 module load StdEnv/2023
 module load sra-toolkit/3.0.9
 module load gcc/12.3
 module load arrow/22.0.0
 module load apptainer/1.4.5
 module load minimap2/2.28
-module load mummer/4.0.0
 module load bcftools/1.22
 module load samtools/1.22.1
 module load python/3.11.5
 
 
-# Set up directories
+
+
 mkdir -p data qc assembly alignment variants visualization
 
 # Download data
@@ -35,31 +34,29 @@ wget "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/GCF_000006945.2/
 unzip ncbi_dataset.zip
 mv ncbi_dataset/data/GCF_000006945.2/GCF_000006945.2_ASM694v2_genomic.fna reference.fasta
 
-
 # Convert SRA to FASTQ
 fasterq-dump SRR32410565
 mv SRR32410565.fastq raw_reads.fastq
 cd ..
 
-# Python environment to use nanoplot and flye in compute canada
+
+# Create environment to use nanoplot anf flye in compute canada
 python -m venv bioinfo_env
 source bioinfo_env/bin/activate
 
 pip install --upgrade pip
-pip install NanoPlot
-pip install medaka
-pip install biopython
-pip install pandas
-pip install matplotlib
-pip install seaborn
-pip install numpy
-pip install quast
-pip install flyey
+pip install NanoPlot==1.46.2
+pip install biopython==1.85+computecanada
+pip install pandas==3.0.0+computecanada
+pip install matplotlib==3.10.8+computecanada
+pip install seaborn==0.13.2+computecanada
+pip install numpy==2.4.2+computecanada
+pip install quast==5.2.0+computecanada
+pip install flye==2.9.5+computecanada
 
 
 # Quality Control
 NanoPlot --fastq data/raw_reads.fastq --outdir qc --plots dot kde --threads 8
-
 
 # Genome Assembly
 flye --nano-hq data/raw_reads.fastq --out-dir assembly --threads 8 --genome-size 5m --iterations 2
@@ -82,6 +79,7 @@ samtools sort alignment/assembly_vs_ref.bam -o alignment/assembly_vs_ref.sorted.
 samtools index alignment/assembly_vs_ref.sorted.bam
 samtools flagstat alignment/assembly_vs_ref.sorted.bam > alignment/assembly_alignment_stats.txt
 samtools coverage alignment/assembly_vs_ref.sorted.bam > alignment/assembly_coverage_summary.txt
+samtools depth alignment/assembly_vs_ref.sorted.bam > alignment/assembly_vs_ref_coverage.txt
 
 # Convert read alignment to BAM and sort
 samtools view -bS alignment/reads_vs_ref.sam > alignment/reads_vs_ref.bam
@@ -98,13 +96,58 @@ samtools faidx data/reference.fasta
 bcftools mpileup -f data/reference.fasta alignment/reads_vs_ref.sorted.bam -Ou | \
 bcftools call -mv --ploidy 1 -Ov -o variants/raw_variants.vcf
 
+bcftools mpileup -f data/reference.fasta alignment/assembly_vs_ref.sorted.bam -Ou | \
+bcftools call -mv --ploidy 1 -Ov -o variants/assembly_vs_ref.vcf
+
 # Filter Variants
 bcftools filter -i 'QUAL>=20 && DP>=10' variants/raw_variants.vcf -o variants/filtered_variants.vcf
+
+bcftools filter -i 'QUAL>=20 && DP>=1' variants/assembly_vs_ref.vcf -o variants/assembly_vs_ref_filtered.vcf
+
+samtools depth alignment/assembly_vs_ref.sorted.bam > assembly_vs_ref_coverage.txt
 
 # Stats
 bcftools stats variants/filtered_variants.vcf > variants/variant_stats.txt
 
-# structural Variant
+bcftools stats variants/assembly_vs_ref_filtered.vcf > variants/variant_stats_assembly.txt
+
+
+
+# structural Variant 
 dnadiff -p variants/comparison \
         data/reference.fasta \
         assembly/assembly.fasta
+
+
+
+# Coverage analysis
+samtools depth alignment/reads_vs_ref.sorted.bam > \
+         visualization/reads_vs_ref_coverage.txt
+
+samtools depth alignment/assembly_vs_ref.sorted.bam > \
+         visualization/assembly_vs_ref_coverage.txt
+
+
+# Index VCF for IGV visualization
+bgzip variants/filtered_variants.vcf
+tabix -p vcf variants/filtered_variants.vcf.gz
+
+
+# Exploratory (added after assignment completion)
+
+# Pull Clair3 Docker image and convert to Apptainer
+apptainer pull clair3.sif docker://hkubal/clair3:latest
+
+# Run Clair3 with Apptainer
+apptainer exec --bind $PWD:$PWD clair3.sif \
+  /opt/bin/run_clair3.sh \
+    --bam_fn=alignment/reads_vs_ref.sorted.bam \
+    --ref_fn=data/reference.fasta \
+    --threads=8 \
+    --platform=ont \
+    --model_path=/opt/models/ont \
+    --output=clair3_output \
+    --sample_name=Salmonella_sample \
+    --include_all_ctgs \
+    --haploid_precise \
+    --no_phasing_for_fa
