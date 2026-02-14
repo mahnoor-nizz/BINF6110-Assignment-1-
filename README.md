@@ -144,7 +144,7 @@ bcftools filter -i 'QUAL>=20 && DP>=10' \
 
 These filtering thresholds were selected based on best practices for bacterial variant calling (Olson et al., 2015).
 
-#### Structural Variant Calling
+### Structural Variant Calling
 
 Structural variants and comprehensive genome comparison were identified using **MUMmer v4.0.0** (Marçais et al., 2018):
 
@@ -188,17 +188,46 @@ Alignment of reads to reference using bcftools resulted in 9450 total variants, 
 
 ![Alt text for the image](https://github.com/mahnoor-nizz/BINF6110-Assignment-1-/blob/main/Visualizations%20%26%20Images/igv_snapshot.png)
 
-Figure 3: Integrative Genomics Viewer (IGV) screenshot showing variants in a 89 bp region (position 62,960,000-63,050,000 on NC_003277.2). The top track shows filtered variants (blue/cyan bars), middle track shows read alignment with coverage depth, and bottom tracks show individual read alignments with called variants (colored bases) and the reference sequence. Multiple SNPs (single base changes) and indels (insertions/deletions) are visible, all well-supported by high read depth.
+**Figure 3:** Integrative Genomics Viewer (IGV) screenshot showing variants in a 89 bp region (position 62,960,000-63,050,000 on NC_003277.2). The top track shows filtered variants (blue/cyan bars), middle track shows read alignment with coverage depth, and bottom tracks show individual read alignments with called variants (colored bases) and the reference sequence. Multiple SNPs (single base changes) and indels (insertions/deletions) are visible, all well-supported by high read depth.
 
 The IGV visualization demonstrated high coverage depth as most positions showed >100x coverage (gray bars in coverage track). Called variants (blue/cyan bars in top track) were supported by multiple reads and even coverage across the region indicating good sequencing quality. SNPs are shown as single colored bases and small indels are shown as purple lines indicating insertions or gaps indicating deletions.
 
+![Alt text for the image](https://github.com/mahnoor-nizz/BINF6110-Assignment-1-/blob/main/Visualizations%20%26%20Images/contig%20alignment%20viewer.png)
+**Figure 4:** QUAST Contig Alignment Viewer showing how assembled contigs map to the reference genome NC_003197.2 (LT2 strain). The top track represents the reference genome (4.86 Mb total length, indicated by the scale from 0 to 5.09 Mbp). The bottom track shows the assembly contigs (4.95 Mb total) with individual alignments colored and positioned according to their mapping to the reference. Orange/red blocks indicate forward-strand alignments, while purple blocks indicate reverse-complement alignments. 
 
+## Discussion
+### Overview of Findings
+The genome assembly and comparative analysis successfully generated a high-quality Salmonella enterica genome assembly from Oxford Nanopore R10 sequencing data and identified substantial genetic variation compared to the reference strain LT2. The assembly produced 3 contigs totaling 5.09 Mb, consisting of a two chromosome (3.3 Mb and 1.67 Mb) and one plasmid (109 kb). This represents a 3.2% size increase compared to the reference genome (4.95 Mb), primarily attributable to plasmid content and potential prophage integrations not present in LT2.
 
+The Flye assembly achieved excellent continuity and completeness. High average identity (99.88%) to the reference indicated accurate assembly with minimal errors. Circular chromosome topology (observed in Bandage graph) confirmed complete chromosomal assembly. Uniform high coverage (157-245x) across all contigs provided confidence in base calling accuracy. Low contig number (3) indicated successful resolution of repetitive regions. The read lengths from Nanopore R10 (N50: 4.7 kb) enabled the assembler to span most repetitive elements. 
 
+The variant calling identified 4,449 total SNPs between the assembled genome and LT2 reference, of which 687 were classified as high-confidence based on their presence in well-aligned, non-repetitive regions. This corresponds to approximately 0.14 SNPs per kb of aligned sequence. Most SNPs were scattered throughout the genome rather than clustered, suggesting gradual evolutionary divergence rather than recent recombination events. Higher SNP density is likely to be observed on genes that are not essential for bacterial fitness, while ribosomal proteins, DNA replication machinery, and central metabolic enzymes are likely to show fewer SNPs, reflecting purifying selection to maintain function. The observed Ts/Tv ratio of 1.52 is consistent with bacterial genomes. Transitions (A->G, C->T) are more common than transversions (A->T, C->G) because they are less likely to cause amino acid changes. The analysis also identified 552 total indels, with 32 classified as high-confidence. 
 
+The plasmid (109 kb, 245x coverage) may encode antimicrobial resistance genes, or other virulence factors and higher coverage (245x vs. 169x and 157x) suggests higher copy number, which is expected for smaller plasmids. The dnadiff analysis revealed substantial structural variation, including 17 relocations and 4 inversions, despite this, the overall gene order and structure remain highly conserved (99.88% identity), confirming that both strains belong to *Salmonella enterica* subspecies *enterica*.
 
+The pattern of genetic variation observed reflects the evolutionary history and ecological adaptation of Salmonella enterica. The high overall similarity (~99.88%) represents the core genome, consisting of genes essential for Salmonella biology that are conserved across strains. This includes DNA replication and repair machinery, transcription and translation components, central metabolism, and cell wall biosynthesis.
 
+In contrast, the indels and structural variants represent the accessory genome, which consists of variable elements that differ between strains including plasmids and genomic islands. This core/accessory genome structure is fundamental to bacterial evolution, allowing conservation of essential functions through purifying selection on the core genome, rapid adaptation to new environments through the accessory genome, and diversification without the loss of species identity.
 
+### Public health implications
+
+Understanding genomic variation in Salmonella enterica has important applications in public health. High-resolution genomic comparison enables outbreak investigation and source tracking by distinguishing outbreak-related strains from others in the environment. The presence of plasmids and accessory genome elements allows for antimicrobial resistance surveillance, as resistance genes are often present in plasmids and can be rapidly transferred between strains. Virulence assessment is improved through identification of virulence factors encoded in plasmids that may explain differences in disease severity. Finally, knowledge of conserved core genome elements versus variable accessory genome regions can inform vaccine and diagnostic development.
+
+### Comparison to Alternative Approaches
+
+This Nanopore-only assembly approach offers advantages and disadvantages compared to alternatives. Compared to short-read assembly using Illumina, Nanopore offers far fewer contigs (3 vs. hundreds), complete plasmid assemblies, faster turnaround, and lower cost. However, Illumina provides higher per-base accuracy (Q30-Q40 vs. Q20), lower systematic error rate, and better SNP calling in repetitive regions.
+
+### Future Directions
+
+Future work should focus plasmid characterization through annotation of plasmid sequences and BLAST searches against the NCBI plasmid database could identify similar plasmids and potential resistance genes. Phylogenetic analysis could place this strain in the context of other Salmonella strains to understand evolutionary relationships and outbreak connections. Improved variant calling using advanced approaches such as Clair3 or DeepVariant (deep learning-based variant callers optimized for Nanopore) and implementation of methylation-aware basecalling and variant filtering could enhance accuracy. 
+
+### Conclusion
+This genome assembly and comparative genomics analysis successfully generated a high-quality Salmonella enterica genome using Oxford Nanopore R10 long-read sequencing and identified 4,449 SNPs, 552 indels, and multiple structural variants compared to the reference strain LT2. The Nanopore-only workflow proved to be effective for bacterial genome assembly, producing 3 contigs (2 chromosomal segments + 1 plasmid) with >99.88% sequence identity to the reference and excellent assembly continuity.
+
+The analysis revealed substantial genomic differences. While core genome content is conserved (99.88% identity), the presence of a plasmid and prophage variation creates significant accessory genome differences. High-quality variant detection enabled identification of thousands of SNPs and indels, while structural variation detection revealed inversions, translocations, and relocations indicating genomic plasticity.
+The identified genetic differences provide insights into strain-level diversity within S. enterica and demonstrate the power of long-read sequencing for resolving complex genomic features including plasmids and mobile genetic elements that would be challenging to detect with short-read approaches alone. 
+
+The presence of a plasmid in this strain, absent from the LT2 reference, is the most striking finding and warrants further investigation to determine if it carries antimicrobial resistance genes, additional virulence factors, or novel metabolic capabilities. This work demonstrates that modern long-read sequencing technology combined with bioinformatics analysis enables comprehensive genomic characterization of bacterial pathogens, supporting public health surveillance, outbreak investigation, and evolutionary studies of this important foodborne pathogen.
 
 
 
@@ -208,7 +237,11 @@ References:
 
   Bogaerts, B., Maex, M., Commans, F., & Goeders, N. (2025, August 22). Oxford Nanopore Technologies R10 sequencing enables accurate cgmlst-based bacterial outbreak investigation of neisseria meningitidis and salmonella enterica when accounting for methylation-related errors. Journal of clinical microbiology. https://doi.org/10.1128/jcm.00410-25 
 
+  Danecek, P., Bonfield, J. K., Liddle, J., Marshall, J., Ohan, V., Pollard, M. O., Whitwham, A., Keane, T., McCarthy, S. A., Davies, R. M., & Li, H. (2021). Twelve years of SAMtools and BCFtools. GigaScience, 10(2), giab008. https://doi.org/10.1093/gigascience/giab008
+
   De Coster, W., D’Hert, S., Schultz, D. T., Cruts, M., & Van Broeckhoven, C. (2018, August 1). NanoPack: Visualizing and processing long-read sequencing data. Bioinformatics (Oxford, England). https://doi.org/10.1093/bioinformatics/bty149 
+
+  Gurevich, A., Saveliev, V., Vyahhi, N., & Tesler, G. (2013). QUAST: Quality assessment tool for genome assemblies. Bioinformatics, 29(8), 1072-1075. https://doi.org/10.1093/bioinformatics/btt086
 
   Hall, M. B., Wick, R. R., Judd, L. M., Nguyen, A. N., Steinig, E. J., Xie, O., Davies, M., Seemann, T., Stinear, T. P., & Coin, L. (2024, October 10). Benchmarking reveals superiority of deep learning variant callers on bacterial nanopore sequence data. eLife. https://doi.org/10.7554/elife.98300 
 
@@ -216,8 +249,12 @@ References:
 
   Li, H. (2018, September). Minimap2: Pairwise alignment for nucleotide sequences | bioinformatics | oxford academic. Oxford Academic. https://doi.org/10.1093/bioinformatics/bty191 
 
+  Marçais, G., Delcher, A. L., Phillippy, A. M., Coston, R., Salzberg, S. L., & Zimin, A. (2018). MUMmer4: A fast and versatile genome alignment system. PLOS Computational Biology, 14(1), e1005944. https://doi.org/10.1371/journal.pcbi.1005944
+
   Saada, B., Zhang, T., Siga, E., Zhang, J., & Magalhães Muniz, M. M. (2024, June 3). Whole-genome alignment: Methods, challenges, and future directions. MDPI. https://doi.org/10.3390/app14114837 
 
   Sanderson, N. D., Hopkins, K. M. V., Colpus, M., Parker, M., Lipworth, S., Crook, D., & Stoesser, N. (2024, May 7). Evaluation of the accuracy of bacterial genome reconstruction with Oxford nanopore R10.4.1 long-read-only sequencing. microbiologyresearch.org. https://doi.org/10.1099/mgen.0.001246 
 
+  Wick, R. R., Schultz, M. B., Zobel, J., & Holt, K. E. (2015). Bandage: Interactive visualization of de novo genome assemblies. Bioinformatics, 31(20), 3350-3352. https://doi.org/10.1093/bioinformatics/btv383
 
+  https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
